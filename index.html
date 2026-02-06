@@ -408,7 +408,7 @@
 
             lastUpdatedText.textContent = lastUpdated.toLocaleTimeString();
             
-            if (diffMins > 5) {
+            if (diffMins > 15) {
                 freshnessDot.classList.add('stale');
                 staleWarning.style.display = 'block';
             } else {
@@ -471,7 +471,7 @@
                     const lastUpdated = new Date(dashboardData.lastUpdated);
                     const now = new Date();
                     const diffMins = (now - lastUpdated) / 60000;
-                    if (diffMins > 5) {
+                    if (diffMins > 10) {
                         freshnessDot.classList.add('stale');
                         staleWarning.style.display = 'block';
                     } else {
