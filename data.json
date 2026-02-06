@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-06T15:53:56.400241Z",
+  "lastUpdated": "2026-02-06T16:49:29.978134Z",
   "models": [
     {
       "provider": "Antigravity",
@@ -27,33 +27,27 @@
     },
     {
       "provider": "Antigravity",
-      "label": "gemini-3-pro-high",
-      "percentage": 0,
-      "resetAt": 1770411237000
-    },
-    {
-      "provider": "Antigravity",
       "label": "gemini-3-flash",
-      "percentage": 0,
+      "percentage": 19.999999999999996,
       "resetAt": 1770409383000
     },
     {
       "provider": "Antigravity",
-      "label": "gemini-3-pro-image",
+      "label": "gemini-3-pro-low",
       "percentage": 0,
-      "resetAt": 1770411237000
+      "resetAt": 1770414570000
     },
     {
       "provider": "Antigravity",
       "label": "gemini-2.5-flash",
       "percentage": 0,
-      "resetAt": 1770411237000
+      "resetAt": 1770414570000
     },
     {
       "provider": "Codex",
       "label": "5h",
       "percentage": 0,
-      "resetAt": 1770411236000
+      "resetAt": 1770414571000
     },
     {
       "provider": "Codex",
