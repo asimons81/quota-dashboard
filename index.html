@@ -84,8 +84,20 @@
 
         .system-nav {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             margin: 0 40px;
+        }
+
+        @media (max-width: 900px) {
+            .system-nav {
+                margin: 20px 0 0 0;
+                width: 100%;
+                justify-content: space-between;
+                order: 3;
+            }
+            header {
+                flex-wrap: wrap;
+            }
         }
 
         .system-nav a {
