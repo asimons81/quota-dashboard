@@ -32,13 +32,21 @@ def fetch_usage():
         providers = usage_info.get('providers', [])
         
         cleaned_usage = []
+        # Models to filter OUT
+        blacklist = ['gemini-2.5-pro', 'gemini-2.5-flash-thinking', 'gemini-2.5-flash-lite']
+        
         for provider in providers:
             provider_name = provider.get('displayName', provider.get('provider', 'Unknown'))
             for window in provider.get('windows', []):
+                label = window.get('label')
+                # Skip blacklisted models
+                if label in blacklist:
+                    continue
+                    
                 # Extract specific fields: labels, percentages, and reset timestamps
                 cleaned_usage.append({
                     'provider': provider_name,
-                    'label': window.get('label'),
+                    'label': label,
                     'percentage': window.get('usedPercent'),
                     'resetAt': window.get('resetAt')  # Epoch timestamp in milliseconds
                 })
