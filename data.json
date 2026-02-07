@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-07T18:15:15.613139Z",
+  "lastUpdated": "2026-02-07T18:20:23.852168Z",
   "models": [
     {
       "provider": "Antigravity",
@@ -27,15 +27,15 @@
     },
     {
       "provider": "Antigravity",
-      "label": "Gemini 3 Pro (L)",
+      "label": "Image Gen (Gemini 3)",
       "percentage": 0,
-      "resetAt": 1770492809000
+      "resetAt": 1770506424000
     },
     {
       "provider": "Antigravity",
-      "label": "Image Gen (Gemini 3)",
+      "label": "Gemini 3 Pro (L)",
       "percentage": 0,
-      "resetAt": 1770506116000
+      "resetAt": 1770492809000
     },
     {
       "provider": "Antigravity",
