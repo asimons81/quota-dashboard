@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-07T19:16:51.161810Z",
+  "lastUpdated": "2026-02-07T19:21:59.295342Z",
   "models": [
     {
       "provider": "Antigravity",
@@ -9,13 +9,13 @@
     },
     {
       "provider": "Antigravity",
-      "label": "Sonnet 4.5 (T)",
+      "label": "Sonnet 4.5",
       "percentage": 80,
       "resetAt": 1770573104000
     },
     {
       "provider": "Antigravity",
-      "label": "Sonnet 4.5",
+      "label": "Sonnet 4.5 (T)",
       "percentage": 80,
       "resetAt": 1770573104000
     },
