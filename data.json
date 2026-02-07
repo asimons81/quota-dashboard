@@ -1,15 +1,15 @@
 {
-  "lastUpdated": "2026-02-07T16:31:07.926149Z",
+  "lastUpdated": "2026-02-07T16:31:36.811804Z",
   "models": [
     {
       "provider": "Antigravity",
-      "label": "claude-opus-4-5-thinking",
+      "label": "Sonnet 4.5",
       "percentage": 80,
       "resetAt": 1770573104000
     },
     {
       "provider": "Antigravity",
-      "label": "claude-sonnet-4-5",
+      "label": "Opus 4.5",
       "percentage": 80,
       "resetAt": 1770573104000
     }
