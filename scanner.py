@@ -57,12 +57,32 @@ def fetch_usage():
             'models': cleaned_usage
         }
         
-        # Save to data.json with pretty printing
-        with open(output_file, 'w') as f:
+        # Save to data.json atomically to prevent partial reads by the browser
+        tmp_file = f"{output_file}.tmp.{os.getpid()}"
+        with open(tmp_file, 'w') as f:
             json.dump(final_output, f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        
+        os.replace(tmp_file, output_file)
             
         print(f"Successfully updated {output_file} at {final_output['lastUpdated']}")
-        
+
+        # Git operations
+        try:
+            subprocess.run(['git', 'add', 'data.json'], cwd=script_dir, check=True)
+            # Check if there are changes to commit
+            status_result = subprocess.run(['git', 'status', '--porcelain'], cwd=script_dir, capture_output=True, text=True, check=True)
+            if status_result.stdout.strip():
+                subprocess.run(['git', 'commit', '-m', f"Auto-sync usage data: {final_output['lastUpdated']}"], cwd=script_dir, check=True)
+                subprocess.run(['git', 'push'], cwd=script_dir, check=True)
+                print("Successfully pushed to GitHub.")
+            else:
+                print("No changes to commit.")
+        except subprocess.CalledProcessError as e:
+            print(f"Git error: {e}", file=sys.stderr)
+            # Don't exit 1 here, we already updated the file locally
+            
     except subprocess.TimeoutExpired:
         print("Error: The 'openclaw status' command timed out after 30 seconds.", file=sys.stderr)
         sys.exit(1)

@@ -359,15 +359,37 @@
         const staleWarning = document.getElementById('stale-warning');
 
         async function fetchData() {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
             try {
-                // In production, fetch('data.json')
-                // For this demo environment, we'll try to fetch the local file
-                const response = await fetch('data.json');
-                const data = await response.json();
+                // Cache-busting: use a 30-second bucket for the version
+                const v = Math.floor(Date.now() / 30000);
+                const response = await fetch(`data.json?v=${v}`, { 
+                    cache: 'no-store',
+                    signal: controller.signal
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                // Parse as text first to avoid partial JSON issues, then JSON.parse
+                const text = await response.text();
+                const data = JSON.parse(text);
+                
                 dashboardData = data;
+                localStorage.setItem('quota_cache', text); // Save last known good data
                 updateUI();
             } catch (error) {
-                console.error('Data sync failed:', error);
+                console.error('Data fetch failed, attempting to use cache:', error);
+                const cached = localStorage.getItem('quota_cache');
+                if (cached) {
+                    dashboardData = JSON.parse(cached);
+                    updateUI();
+                }
+                staleWarning.style.display = 'block';
+                freshnessDot.classList.add('stale');
+            } finally {
+                clearTimeout(timeoutId);
             }
         }
 
