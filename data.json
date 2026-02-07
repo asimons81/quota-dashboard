@@ -1,21 +1,9 @@
 {
-  "lastUpdated": "2026-02-07T12:27:06.477743Z",
+  "lastUpdated": "2026-02-07T12:32:14.239471Z",
   "models": [
     {
       "provider": "Antigravity",
       "label": "claude-opus-4-5-thinking",
-      "percentage": 80,
-      "resetAt": 1770573104000
-    },
-    {
-      "provider": "Antigravity",
-      "label": "claude-sonnet-4-5-thinking",
-      "percentage": 80,
-      "resetAt": 1770573104000
-    },
-    {
-      "provider": "Antigravity",
-      "label": "gpt-oss-120b-medium",
       "percentage": 80,
       "resetAt": 1770573104000
     },
@@ -27,27 +15,33 @@
     },
     {
       "provider": "Antigravity",
-      "label": "gemini-3-pro-low",
-      "percentage": 0,
-      "resetAt": 1770485227000
+      "label": "gpt-oss-120b-medium",
+      "percentage": 80,
+      "resetAt": 1770573104000
     },
     {
       "provider": "Antigravity",
-      "label": "gemini-3-pro-image",
-      "percentage": 0,
-      "resetAt": 1770485227000
-    },
-    {
-      "provider": "Antigravity",
-      "label": "gemini-3-pro-high",
-      "percentage": 0,
-      "resetAt": 1770485227000
+      "label": "claude-sonnet-4-5-thinking",
+      "percentage": 80,
+      "resetAt": 1770573104000
     },
     {
       "provider": "Antigravity",
       "label": "gemini-3-flash",
       "percentage": 0,
       "resetAt": 1770481383000
+    },
+    {
+      "provider": "Antigravity",
+      "label": "gemini-3-pro-image",
+      "percentage": 0,
+      "resetAt": 1770485534000
+    },
+    {
+      "provider": "Antigravity",
+      "label": "gemini-3-pro-high",
+      "percentage": 0,
+      "resetAt": 1770485534000
     },
     {
       "provider": "Codex",
