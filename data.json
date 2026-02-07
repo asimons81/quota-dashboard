@@ -1,12 +1,6 @@
 {
-  "lastUpdated": "2026-02-07T22:17:17.250647Z",
+  "lastUpdated": "2026-02-07T22:22:31.639144Z",
   "models": [
-    {
-      "provider": "Antigravity",
-      "label": "Opus 4.5 (T)",
-      "percentage": 80,
-      "resetAt": 1770573104000
-    },
     {
       "provider": "Antigravity",
       "label": "Sonnet 4.5",
@@ -21,27 +15,33 @@
     },
     {
       "provider": "Antigravity",
+      "label": "Opus 4.5 (T)",
+      "percentage": 80,
+      "resetAt": 1770573104000
+    },
+    {
+      "provider": "Antigravity",
       "label": "Gemini 3 Flash",
       "percentage": 40,
       "resetAt": 1770517383000
     },
     {
       "provider": "Antigravity",
-      "label": "Gemini 3 Pro (L)",
+      "label": "Gemini 3 Pro (H)",
       "percentage": 0,
-      "resetAt": 1770520636000
+      "resetAt": 1770520952000
     },
     {
       "provider": "Antigravity",
-      "label": "Gemini 3 Pro (H)",
+      "label": "Gemini 3 Pro (L)",
       "percentage": 0,
-      "resetAt": 1770520636000
+      "resetAt": 1770520952000
     },
     {
       "provider": "Codex",
       "label": "Codex 5.2 (5h)",
       "percentage": 33,
-      "resetAt": 1770504669000
+      "resetAt": 1770504668000
     },
     {
       "provider": "Codex",
