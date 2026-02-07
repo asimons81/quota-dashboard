@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-07T17:44:23.257937Z",
+  "lastUpdated": "2026-02-07T17:44:44.112183Z",
   "models": [
     {
       "provider": "Antigravity",
@@ -41,7 +41,7 @@
       "provider": "Codex",
       "label": "Codex 5.2 (5h)",
       "percentage": 0,
-      "resetAt": 1770504263000
+      "resetAt": 1770504284000
     },
     {
       "provider": "Codex",
