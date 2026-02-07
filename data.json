@@ -1,12 +1,6 @@
 {
-  "lastUpdated": "2026-02-07T17:33:53.981285Z",
+  "lastUpdated": "2026-02-07T17:36:13.383467Z",
   "models": [
-    {
-      "provider": "Antigravity",
-      "label": "Sonnet 4.5 (T)",
-      "percentage": 80,
-      "resetAt": 1770573104000
-    },
     {
       "provider": "Antigravity",
       "label": "Opus 4.5 (T)",
@@ -16,6 +10,12 @@
     {
       "provider": "Antigravity",
       "label": "Sonnet 4.5",
+      "percentage": 80,
+      "resetAt": 1770573104000
+    },
+    {
+      "provider": "Antigravity",
+      "label": "Sonnet 4.5 (T)",
       "percentage": 80,
       "resetAt": 1770573104000
     },
@@ -38,10 +38,16 @@
       "resetAt": 1770492809000
     },
     {
+      "provider": "Antigravity",
+      "label": "Image Gen (Gemini 3)",
+      "percentage": 0,
+      "resetAt": 1770503773000
+    },
+    {
       "provider": "Codex",
       "label": "Codex 5.2 (5h)",
       "percentage": 0,
-      "resetAt": 1770503634000
+      "resetAt": 1770503773000
     },
     {
       "provider": "Codex",
