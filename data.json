@@ -1,16 +1,16 @@
 {
-  "lastUpdated": "2026-02-08T21:16:28.281888Z",
+  "lastUpdated": "2026-02-08T21:31:19.653851Z",
   "models": [
     {
       "provider": "Antigravity",
       "label": "Gemini 3 Pro (H)",
-      "percentage": 40,
+      "percentage": 60,
       "resetAt": 1770590792000
     },
     {
       "provider": "Antigravity",
       "label": "Gemini 3 Pro (L)",
-      "percentage": 40,
+      "percentage": 60,
       "resetAt": 1770590792000
     },
     {
@@ -23,19 +23,25 @@
       "provider": "Antigravity",
       "label": "Google Image Gen",
       "percentage": 0,
-      "resetAt": 1770603389000
+      "resetAt": 1770604280000
     },
     {
       "provider": "Antigravity",
-      "label": "Antigravity Sonnet 4.5",
+      "label": "Antigravity Sonnet 4.5 (T)",
       "percentage": 0,
-      "resetAt": 1770603389000
+      "resetAt": 1770604280000
+    },
+    {
+      "provider": "Antigravity",
+      "label": "Antigravity Opus 4.5 (T)",
+      "percentage": 0,
+      "resetAt": 1770604280000
     },
     {
       "provider": "Codex",
       "label": "Codex 5.2 (5h)",
       "percentage": 0,
-      "resetAt": 1770603389000
+      "resetAt": 1770604280000
     },
     {
       "provider": "Codex",
