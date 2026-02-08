@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-08T03:25:43.202274Z",
+  "lastUpdated": "2026-02-08T03:30:53.361471Z",
   "models": [
     {
       "provider": "Antigravity",
@@ -21,15 +21,15 @@
     },
     {
       "provider": "Antigravity",
-      "label": "Gemini 3 Flash",
-      "percentage": 19.999999999999996,
-      "resetAt": 1770535383000
-    },
-    {
-      "provider": "Antigravity",
       "label": "Gemini 3 Pro (H)",
       "percentage": 19.999999999999996,
       "resetAt": 1770522251000
+    },
+    {
+      "provider": "Antigravity",
+      "label": "Gemini 3 Flash",
+      "percentage": 19.999999999999996,
+      "resetAt": 1770535383000
     },
     {
       "provider": "Antigravity",
@@ -38,9 +38,15 @@
       "resetAt": 1770522251000
     },
     {
+      "provider": "Antigravity",
+      "label": "Google Image Gen",
+      "percentage": 0,
+      "resetAt": 1770539453000
+    },
+    {
       "provider": "Codex",
       "label": "Codex 5.2 (5h)",
-      "percentage": 12,
+      "percentage": 13,
       "resetAt": 1770524577000
     },
     {
