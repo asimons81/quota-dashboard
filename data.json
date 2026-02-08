@@ -1,15 +1,15 @@
 {
-  "lastUpdated": "2026-02-08T02:26:35.989620Z",
+  "lastUpdated": "2026-02-08T02:31:45.900720Z",
   "models": [
     {
       "provider": "Antigravity",
-      "label": "Antigravity Opus 4.5 (T)",
+      "label": "Antigravity Sonnet 4.5 (T)",
       "percentage": 80,
       "resetAt": 1770573104000
     },
     {
       "provider": "Antigravity",
-      "label": "Antigravity Sonnet 4.5 (T)",
+      "label": "Antigravity Opus 4.5 (T)",
       "percentage": 80,
       "resetAt": 1770573104000
     },
@@ -30,6 +30,12 @@
       "label": "Gemini 3 Pro (H)",
       "percentage": 19.999999999999996,
       "resetAt": 1770522251000
+    },
+    {
+      "provider": "Antigravity",
+      "label": "Gemini 3 Flash",
+      "percentage": 0,
+      "resetAt": 1770535383000
     },
     {
       "provider": "Codex",
