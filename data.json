@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-08T09:13:56.847070Z",
+  "lastUpdated": "2026-02-08T09:19:04.617486Z",
   "models": [
     {
       "provider": "Antigravity",
@@ -35,7 +35,13 @@
       "provider": "Antigravity",
       "label": "Gemini 3 Flash",
       "percentage": 0,
-      "resetAt": 1770560037000
+      "resetAt": 1770560345000
+    },
+    {
+      "provider": "Antigravity",
+      "label": "Google Image Gen",
+      "percentage": 0,
+      "resetAt": 1770560345000
     },
     {
       "provider": "Codex",
