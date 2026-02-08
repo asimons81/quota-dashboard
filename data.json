@@ -1,15 +1,15 @@
 {
-  "lastUpdated": "2026-02-08T08:22:36.099932Z",
+  "lastUpdated": "2026-02-08T08:27:44.566112Z",
   "models": [
     {
       "provider": "Antigravity",
-      "label": "Antigravity Sonnet 4.5",
+      "label": "Antigravity Sonnet 4.5 (T)",
       "percentage": 80,
       "resetAt": 1770573104000
     },
     {
       "provider": "Antigravity",
-      "label": "Antigravity Sonnet 4.5 (T)",
+      "label": "Antigravity Sonnet 4.5",
       "percentage": 80,
       "resetAt": 1770573104000
     },
@@ -33,9 +33,9 @@
     },
     {
       "provider": "Antigravity",
-      "label": "Gemini 3 Flash",
+      "label": "Google Image Gen",
       "percentage": 0,
-      "resetAt": 1770556956000
+      "resetAt": 1770557265000
     },
     {
       "provider": "Codex",
