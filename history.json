@@ -25,6 +25,10 @@
     {
       "timestamp": "2026-02-08T22:46:28.528070Z",
       "percentage": 60
+    },
+    {
+      "timestamp": "2026-02-08T23:01:23.855938Z",
+      "percentage": 0
     }
   ],
   "Antigravity:Antigravity Sonnet 4.5": [
@@ -38,6 +42,10 @@
     },
     {
       "timestamp": "2026-02-08T22:46:28.528070Z",
+      "percentage": 60
+    },
+    {
+      "timestamp": "2026-02-08T23:01:23.855938Z",
       "percentage": 60
     }
   ],
@@ -53,6 +61,10 @@
     {
       "timestamp": "2026-02-08T22:46:28.528070Z",
       "percentage": 60
+    },
+    {
+      "timestamp": "2026-02-08T23:01:23.855938Z",
+      "percentage": 60
     }
   ],
   "Antigravity:Antigravity Opus 4.5 (T)": [
@@ -66,6 +78,10 @@
     },
     {
       "timestamp": "2026-02-08T22:46:28.528070Z",
+      "percentage": 60
+    },
+    {
+      "timestamp": "2026-02-08T23:01:23.855938Z",
       "percentage": 60
     }
   ],
@@ -81,6 +97,10 @@
     {
       "timestamp": "2026-02-08T22:46:28.528070Z",
       "percentage": 40
+    },
+    {
+      "timestamp": "2026-02-08T23:01:23.855938Z",
+      "percentage": 40
     }
   ],
   "Antigravity:Google Image Gen": [
@@ -94,6 +114,10 @@
     },
     {
       "timestamp": "2026-02-08T22:46:28.528070Z",
+      "percentage": 0
+    },
+    {
+      "timestamp": "2026-02-08T23:01:23.855938Z",
       "percentage": 0
     }
   ],
@@ -109,6 +133,10 @@
     {
       "timestamp": "2026-02-08T22:46:28.528070Z",
       "percentage": 0
+    },
+    {
+      "timestamp": "2026-02-08T23:01:23.855938Z",
+      "percentage": 0
     }
   ],
   "Codex:Codex 5.2 (Day)": [
@@ -122,6 +150,10 @@
     },
     {
       "timestamp": "2026-02-08T22:46:28.528070Z",
+      "percentage": 27
+    },
+    {
+      "timestamp": "2026-02-08T23:01:23.855938Z",
       "percentage": 27
     }
   ]
