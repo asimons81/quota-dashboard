@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-08T06:32:08.604455Z",
+  "lastUpdated": "2026-02-08T06:44:24.107775Z",
   "models": [
     {
       "provider": "Antigravity",
@@ -9,13 +9,13 @@
     },
     {
       "provider": "Antigravity",
-      "label": "Antigravity Sonnet 4.5 (T)",
+      "label": "Antigravity Sonnet 4.5",
       "percentage": 80,
       "resetAt": 1770573104000
     },
     {
       "provider": "Antigravity",
-      "label": "Antigravity Sonnet 4.5",
+      "label": "Antigravity Sonnet 4.5 (T)",
       "percentage": 80,
       "resetAt": 1770573104000
     },
@@ -35,18 +35,18 @@
       "provider": "Antigravity",
       "label": "Google Image Gen",
       "percentage": 0,
-      "resetAt": 1770550329000
+      "resetAt": 1770551064000
     },
     {
       "provider": "Codex",
       "label": "Codex 5.2 (5h)",
-      "percentage": 1,
+      "percentage": 2,
       "resetAt": 1770550145000
     },
     {
       "provider": "Codex",
       "label": "Codex 5.2 (Day)",
-      "percentage": 26,
+      "percentage": 27,
       "resetAt": 1770660003000
     }
   ]
