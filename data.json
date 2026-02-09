@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-09T02:01:24.088323Z",
+  "lastUpdated": "2026-02-09T02:16:20.382043Z",
   "models": [
     {
       "provider": "Antigravity",
@@ -17,7 +17,7 @@
       "provider": "Antigravity",
       "label": "Google Image Gen",
       "percentage": 0,
-      "resetAt": 1770620484000
+      "resetAt": 1770621380000
     },
     {
       "provider": "Antigravity",
@@ -29,7 +29,7 @@
       "provider": "Codex",
       "label": "Codex 5.2 (5h)",
       "percentage": 0,
-      "resetAt": 1770620484000
+      "resetAt": 1770621380000
     },
     {
       "provider": "Codex",
