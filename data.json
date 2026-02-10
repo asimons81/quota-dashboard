@@ -1,11 +1,11 @@
 {
-  "lastUpdated": "2026-02-10T06:35:03.020904Z",
+  "lastUpdated": "2026-02-10T06:40:12.036602Z",
   "models": [
     {
       "provider": "Antigravity",
       "label": "Google Image Gen",
       "percentage": 0,
-      "resetAt": 1770723303000
+      "resetAt": 1770723612000
     },
     {
       "provider": "Antigravity",
