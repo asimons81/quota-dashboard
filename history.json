@@ -893,6 +893,10 @@
     {
       "timestamp": "2026-02-10T06:32:14.639863Z",
       "percentage": 0
+    },
+    {
+      "timestamp": "2026-02-10T06:35:03.020904Z",
+      "percentage": 0
     }
   ],
   "Antigravity:Google Image Gen": [
@@ -1126,6 +1130,10 @@
     },
     {
       "timestamp": "2026-02-10T06:32:14.639863Z",
+      "percentage": 0
+    },
+    {
+      "timestamp": "2026-02-10T06:35:03.020904Z",
       "percentage": 0
     }
   ],
@@ -1373,6 +1381,10 @@
     {
       "timestamp": "2026-02-10T06:32:14.639863Z",
       "percentage": 2
+    },
+    {
+      "timestamp": "2026-02-10T06:35:03.020904Z",
+      "percentage": 2
     }
   ],
   "Codex:Codex 5.2 (Day)": [
@@ -1618,6 +1630,10 @@
     },
     {
       "timestamp": "2026-02-10T06:32:14.639863Z",
+      "percentage": 1
+    },
+    {
+      "timestamp": "2026-02-10T06:35:03.020904Z",
       "percentage": 1
     }
   ]
