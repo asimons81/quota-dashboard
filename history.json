@@ -183,6 +183,10 @@
     {
       "timestamp": "2026-02-10T03:23:38.749088Z",
       "percentage": 0
+    },
+    {
+      "timestamp": "2026-02-10T03:28:49.274020Z",
+      "percentage": 0
     }
   ],
   "Antigravity:Gemini 3 Pro (L)": [
@@ -368,6 +372,10 @@
     },
     {
       "timestamp": "2026-02-10T03:23:38.749088Z",
+      "percentage": 0
+    },
+    {
+      "timestamp": "2026-02-10T03:28:49.274020Z",
       "percentage": 0
     }
   ],
@@ -745,6 +753,10 @@
     {
       "timestamp": "2026-02-10T03:23:38.749088Z",
       "percentage": 40
+    },
+    {
+      "timestamp": "2026-02-10T03:28:49.274020Z",
+      "percentage": 40
     }
   ],
   "Antigravity:Google Image Gen": [
@@ -926,6 +938,10 @@
     },
     {
       "timestamp": "2026-02-10T03:23:38.749088Z",
+      "percentage": 0
+    },
+    {
+      "timestamp": "2026-02-10T03:28:49.274020Z",
       "percentage": 0
     }
   ],
@@ -1121,6 +1137,10 @@
     {
       "timestamp": "2026-02-10T03:23:38.749088Z",
       "percentage": 2
+    },
+    {
+      "timestamp": "2026-02-10T03:28:49.274020Z",
+      "percentage": 2
     }
   ],
   "Codex:Codex 5.2 (Day)": [
@@ -1314,6 +1334,10 @@
     },
     {
       "timestamp": "2026-02-10T03:23:38.749088Z",
+      "percentage": 1
+    },
+    {
+      "timestamp": "2026-02-10T03:28:49.274020Z",
       "percentage": 1
     }
   ]
