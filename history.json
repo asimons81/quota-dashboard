@@ -131,6 +131,10 @@
     {
       "timestamp": "2026-02-10T01:01:26.439020Z",
       "percentage": 40
+    },
+    {
+      "timestamp": "2026-02-10T01:16:24.327837Z",
+      "percentage": 60
     }
   ],
   "Antigravity:Gemini 3 Pro (L)": [
@@ -265,6 +269,10 @@
     {
       "timestamp": "2026-02-10T01:01:26.439020Z",
       "percentage": 40
+    },
+    {
+      "timestamp": "2026-02-10T01:16:24.327837Z",
+      "percentage": 60
     }
   ],
   "Antigravity:Antigravity Sonnet 4.5": [
@@ -723,6 +731,10 @@
     {
       "timestamp": "2026-02-10T01:01:26.439020Z",
       "percentage": 0
+    },
+    {
+      "timestamp": "2026-02-10T01:16:24.327837Z",
+      "percentage": 0
     }
   ],
   "Codex:Codex 5.2 (5h)": [
@@ -865,6 +877,10 @@
     {
       "timestamp": "2026-02-10T01:01:26.439020Z",
       "percentage": 0
+    },
+    {
+      "timestamp": "2026-02-10T01:16:24.327837Z",
+      "percentage": 0
     }
   ],
   "Codex:Codex 5.2 (Day)": [
@@ -1006,6 +1022,10 @@
     },
     {
       "timestamp": "2026-02-10T01:01:26.439020Z",
+      "percentage": 0
+    },
+    {
+      "timestamp": "2026-02-10T01:16:24.327837Z",
       "percentage": 0
     }
   ]
