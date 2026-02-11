@@ -15,13 +15,15 @@ def fetch_usage():
 
     try:
         # Execute the openclaw command with a 30-second timeout
-        # Using shell=False for security
+        # On Windows, we need to use the .cmd or .ps1 wrapper if not in PATH as exe
+        cmd = 'openclaw.cmd' if os.name == 'nt' else 'openclaw'
         result = subprocess.run(
-            ['openclaw', 'status', '--usage', '--json'],
+            [cmd, 'status', '--usage', '--json'],
             capture_output=True,
             text=True,
             timeout=30,
-            check=True
+            check=True,
+            shell=True # Needed for .cmd wrappers on Windows
         )
         
         # Parse the JSON output from stdout
