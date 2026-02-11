@@ -1,23 +1,23 @@
 {
-  "lastUpdated": "2026-02-11T14:54:49.647314Z",
+  "lastUpdated": "2026-02-11T15:09:41.811150Z",
   "models": [
     {
       "provider": "Antigravity",
       "label": "gemini-3-flash",
-      "percentage": 60,
+      "percentage": 80,
       "resetAt": 1770830546000
     },
     {
       "provider": "Antigravity",
       "label": "gemini-2.5-flash",
       "percentage": 0,
-      "resetAt": 1770839688000
+      "resetAt": 1770840581000
     },
     {
       "provider": "Antigravity",
       "label": "gemini-3-pro-image",
       "percentage": 0,
-      "resetAt": 1770839688000
+      "resetAt": 1770840581000
     }
   ]
 }
