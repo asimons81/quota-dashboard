@@ -1,17 +1,23 @@
 {
-  "lastUpdated": "2026-02-11T19:54:42.745688Z",
+  "lastUpdated": "2026-02-11T20:00:00Z",
   "models": [
     {
+      "key": "antigravity:gemini-3-pro-image",
       "provider": "Antigravity",
       "label": "gemini-3-pro-image",
-      "percentage": 0,
-      "resetAt": 1770857682000
+      "percentage": 0.0,
+      "resetAt": 1770857682000,
+      "resetAtIso": "2026-02-12T07:34:42Z",
+      "lastUpdated": "2026-02-11T20:00:00Z"
     },
     {
+      "key": "antigravity:gemini-2.5-flash",
       "provider": "Antigravity",
       "label": "gemini-2.5-flash",
-      "percentage": 0,
-      "resetAt": 1770857682000
+      "percentage": 20.0,
+      "resetAt": 1770857682000,
+      "resetAtIso": "2026-02-12T07:34:42Z",
+      "lastUpdated": "2026-02-11T20:00:00Z"
     }
   ]
 }

@@ -1,0 +1,6 @@
+{
+  "syncEndpoint": null,
+  "syncMethod": "POST",
+  "syncPayload": {},
+  "refreshDelayMs": 3000
+}

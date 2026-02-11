@@ -1,106 +1,361 @@
-import subprocess
+import argparse
 import json
-import sys
 import os
-from datetime import datetime
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
-def fetch_usage():
-    """
-    Executes 'openclaw status --usage --json', parses the output,
-    and saves a cleaned version to 'data.json'.
-    """
-    # Define paths relative to the script location
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    output_file = os.path.join(script_dir, 'data.json')
+DEFAULT_SAMPLE_INTERVAL_MIN = 10
+DEFAULT_MAX_HISTORY = 288
+BLACKLIST = {"gemini-2.5-pro", "gemini-2.5-flash-thinking", "gemini-2.5-flash-lite"}
+
+
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def canonical_key(provider: str, label: str) -> str:
+    return f"{(provider or '').strip().lower()}:{(label or '').strip().lower()}"
+
+
+def normalize_percent(value: Any) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        number = 0.0
+    number = max(0.0, min(100.0, number))
+    return round(number, 2)
+
+
+def normalize_reset_at(value: Any) -> Tuple[Optional[int], Optional[str]]:
+    if value in (None, "", "null"):
+        return None, None
 
     try:
-        # Execute the openclaw command with a 30-second timeout
-        # On Windows, we need to use the .cmd or .ps1 wrapper if not in PATH as exe
-        cmd = 'openclaw.cmd' if os.name == 'nt' else 'openclaw'
-        result = subprocess.run(
-            [cmd, 'status', '--usage', '--json'],
+        numeric = int(float(value))
+    except (TypeError, ValueError):
+        return None, None
+
+    if numeric <= 0:
+        return None, None
+
+    # Heuristic: if seconds epoch slipped in, convert to ms.
+    if numeric < 10_000_000_000:
+        numeric *= 1000
+
+    iso = datetime.fromtimestamp(numeric / 1000, tz=timezone.utc).isoformat().replace("+00:00", "Z")
+    return numeric, iso
+
+
+def atomic_write_json(path: Path, payload: Any) -> None:
+    temp_path = path.with_name(f"{path.name}.tmp.{os.getpid()}")
+    with temp_path.open("w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temp_path, path)
+
+
+def load_json_safe(path: Path, default: Any) -> Any:
+    if not path.exists():
+        return default
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            return json.load(handle)
+    except (json.JSONDecodeError, OSError):
+        return default
+
+
+def run_openclaw(timeout_s: int = 30) -> subprocess.CompletedProcess:
+    if os.name == "nt":
+        command = "openclaw.cmd status --usage --json"
+        return subprocess.run(
+            ["cmd.exe", "/c", command],
             capture_output=True,
             text=True,
-            timeout=30,
+            timeout=timeout_s,
             check=True,
-            shell=True # Needed for .cmd wrappers on Windows
         )
-        
-        # Parse the JSON output from stdout
-        raw_data = json.loads(result.stdout)
-        
-        # Navigate to the 'usage' section
-        usage_info = raw_data.get('usage', {})
-        providers = usage_info.get('providers', [])
-        
-        cleaned_usage = []
-        # Models to filter OUT
-        blacklist = ['gemini-2.5-pro', 'gemini-2.5-flash-thinking', 'gemini-2.5-flash-lite']
-        
-        for provider in providers:
-            provider_name = provider.get('displayName', provider.get('provider', 'Unknown'))
-            for window in provider.get('windows', []):
-                label = window.get('label')
-                # Skip blacklisted models
-                if label in blacklist:
-                    continue
-                    
-                # Extract specific fields: labels, percentages, and reset timestamps
-                cleaned_usage.append({
-                    'provider': provider_name,
-                    'label': label,
-                    'percentage': window.get('usedPercent'),
-                    'resetAt': window.get('resetAt')  # Epoch timestamp in milliseconds
-                })
-        
-        # Prepare the final structure with a 'lastUpdated' timestamp
-        final_output = {
-            'lastUpdated': datetime.utcnow().isoformat() + 'Z',
-            'models': cleaned_usage
-        }
-        
-        # Save to data.json atomically to prevent partial reads by the browser
-        tmp_file = f"{output_file}.tmp.{os.getpid()}"
-        with open(tmp_file, 'w') as f:
-            json.dump(final_output, f, indent=2)
-            f.flush()
-            os.fsync(f.fileno())
-        
-        os.replace(tmp_file, output_file)
-            
-        print(f"Successfully updated {output_file} at {final_output['lastUpdated']}")
 
-        # Git operations
-        try:
-            subprocess.run(['git', 'add', 'data.json'], cwd=script_dir, check=True)
-            # Check if there are changes to commit
-            status_result = subprocess.run(['git', 'status', '--porcelain'], cwd=script_dir, capture_output=True, text=True, check=True)
-            if status_result.stdout.strip():
-                subprocess.run(['git', 'commit', '-m', f"Auto-sync usage data: {final_output['lastUpdated']}"], cwd=script_dir, check=True)
-                subprocess.run(['git', 'push'], cwd=script_dir, check=True)
-                print("Successfully pushed to GitHub.")
-            else:
-                print("No changes to commit.")
-        except subprocess.CalledProcessError as e:
-            print(f"Git error: {e}", file=sys.stderr)
-            # Don't exit 1 here, we already updated the file locally
-            
+    return subprocess.run(
+        ["openclaw", "status", "--usage", "--json"],
+        capture_output=True,
+        text=True,
+        timeout=timeout_s,
+        check=True,
+    )
+
+
+def build_models(raw_data: Dict[str, Any], scanner_time_iso: str) -> List[Dict[str, Any]]:
+    providers = raw_data.get("usage", {}).get("providers", [])
+    models: List[Dict[str, Any]] = []
+
+    for provider in providers:
+        provider_name = str(provider.get("displayName") or provider.get("provider") or "unknown").strip()
+        source_last_updated = provider.get("lastUpdated") or provider.get("updatedAt")
+
+        for window in provider.get("windows", []):
+            label = str(window.get("label") or "unknown").strip()
+            if label in BLACKLIST:
+                continue
+
+            percent = normalize_percent(window.get("usedPercent"))
+            reset_ms, reset_iso = normalize_reset_at(window.get("resetAt"))
+            source_window_updated = window.get("lastUpdated") or window.get("updatedAt") or source_last_updated
+
+            model = {
+                "key": canonical_key(provider_name, label),
+                "provider": provider_name,
+                "label": label,
+                "percentage": percent,
+                "resetAt": reset_ms,
+                "resetAtIso": reset_iso,
+                "lastUpdated": scanner_time_iso,
+            }
+
+            if source_window_updated is not None:
+                model["sourceLastUpdated"] = source_window_updated
+
+            models.append(model)
+
+    models.sort(key=lambda item: item["key"])
+    return models
+
+
+def data_semantic_signature(data_payload: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "models": [
+            {
+                "key": model.get("key"),
+                "provider": model.get("provider"),
+                "label": model.get("label"),
+                "percentage": model.get("percentage"),
+                "resetAt": model.get("resetAt"),
+                "resetAtIso": model.get("resetAtIso"),
+                "sourceLastUpdated": model.get("sourceLastUpdated"),
+            }
+            for model in data_payload.get("models", [])
+        ]
+    }
+
+
+def update_history(
+    history_payload: Dict[str, List[Dict[str, Any]]],
+    models: List[Dict[str, Any]],
+    timestamp_iso: str,
+    sample_interval_min: int,
+    max_samples: int,
+) -> Tuple[Dict[str, List[Dict[str, Any]]], bool]:
+    changed = False
+    now_dt = datetime.fromisoformat(timestamp_iso.replace("Z", "+00:00"))
+
+    for model in models:
+        key = model["key"]
+        series = history_payload.get(key, [])
+        entry = {"timestamp": timestamp_iso, "percentage": model["percentage"]}
+
+        should_append = False
+        if not series:
+            should_append = True
+        else:
+            last_entry = series[-1]
+            last_pct = normalize_percent(last_entry.get("percentage"))
+            last_ts_raw = last_entry.get("timestamp")
+
+            elapsed_min = sample_interval_min
+            if last_ts_raw:
+                try:
+                    last_dt = datetime.fromisoformat(last_ts_raw.replace("Z", "+00:00"))
+                    elapsed_min = (now_dt - last_dt).total_seconds() / 60
+                except ValueError:
+                    elapsed_min = sample_interval_min
+
+            pct_changed = abs(last_pct - model["percentage"]) > 0.0001
+            should_append = pct_changed or elapsed_min >= sample_interval_min
+
+        if should_append:
+            new_series = (series + [entry])[-max_samples:]
+            history_payload[key] = new_series
+            changed = True
+
+    return history_payload, changed
+
+
+def run_git(script_dir: Path, commit_message: str, files: List[str], dry_run: bool, no_git: bool) -> None:
+    if no_git:
+        print("Skipping git operations (--no-git enabled).")
+        return
+
+    if dry_run:
+        print("Dry-run mode: would run git add/commit/push.")
+        return
+
+    subprocess.run(["git", "add", *files], cwd=script_dir, check=True)
+    status = subprocess.run(
+        ["git", "diff", "--cached", "--name-only"],
+        cwd=script_dir,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    staged = [line.strip() for line in status.stdout.splitlines() if line.strip()]
+    if not staged:
+        print("No staged changes; skipping commit.")
+        return
+
+    subprocess.run(["git", "commit", "-m", commit_message], cwd=script_dir, check=True)
+    subprocess.run(["git", "push"], cwd=script_dir, check=True)
+    print("Successfully committed and pushed changes.")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Fetch and persist OpenClaw quota usage.")
+    parser.add_argument("--dry-run", action="store_true", help="Process data without writing files or running git.")
+    parser.add_argument("--no-git", action="store_true", help="Write output files but skip git add/commit/push.")
+    parser.add_argument(
+        "--history-interval-min",
+        type=int,
+        default=int(os.getenv("HISTORY_INTERVAL_MIN", DEFAULT_SAMPLE_INTERVAL_MIN)),
+        help="Append history sample when unchanged values age past this many minutes.",
+    )
+    parser.add_argument(
+        "--history-max-samples",
+        type=int,
+        default=int(os.getenv("HISTORY_MAX_SAMPLES", DEFAULT_MAX_HISTORY)),
+        help="Maximum number of history samples retained per key.",
+    )
+    return parser.parse_args()
+
+
+def write_summary(path: Path, summary: Dict[str, Any], dry_run: bool) -> None:
+    if dry_run:
+        print("Dry-run mode: summary.json not written.")
+        print(json.dumps(summary, indent=2))
+        return
+    atomic_write_json(path, summary)
+
+
+def main() -> int:
+    args = parse_args()
+    script_dir = Path(__file__).resolve().parent
+    data_path = script_dir / "data.json"
+    history_path = script_dir / "history.json"
+    summary_path = script_dir / "summary.json"
+
+    scanner_time_iso = utc_now_iso()
+
+    try:
+        result = run_openclaw()
+    except FileNotFoundError:
+        summary = {
+            "lastUpdated": scanner_time_iso,
+            "status": "error",
+            "error": "openclaw executable not found in PATH",
+            "counts": {"models": 0, "historyKeys": 0},
+        }
+        write_summary(summary_path, summary, args.dry_run)
+        print(summary["error"], file=sys.stderr)
+        return 1
     except subprocess.TimeoutExpired:
-        print("Error: The 'openclaw status' command timed out after 30 seconds.", file=sys.stderr)
-        sys.exit(1)
-    except subprocess.CalledProcessError as e:
-        print(f"Error: 'openclaw status' failed with exit code {e.returncode}.", file=sys.stderr)
-        if e.stderr:
-            print(f"Stderr: {e.stderr}", file=sys.stderr)
-        sys.exit(1)
-    except json.JSONDecodeError as e:
-        print(f"Error: Failed to parse JSON output from openclaw: {e}", file=sys.stderr)
-        # Optionally log the raw output for debugging
-        # print(f"Raw output: {result.stdout}", file=sys.stderr)
-        sys.exit(1)
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}", file=sys.stderr)
-        sys.exit(1)
+        summary = {
+            "lastUpdated": scanner_time_iso,
+            "status": "error",
+            "error": "openclaw command timed out after 30s",
+            "counts": {"models": 0, "historyKeys": 0},
+        }
+        write_summary(summary_path, summary, args.dry_run)
+        print(summary["error"], file=sys.stderr)
+        return 1
+    except subprocess.CalledProcessError as exc:
+        summary = {
+            "lastUpdated": scanner_time_iso,
+            "status": "error",
+            "error": f"openclaw failed with exit code {exc.returncode}",
+            "stderr": (exc.stderr or "").strip(),
+            "counts": {"models": 0, "historyKeys": 0},
+        }
+        write_summary(summary_path, summary, args.dry_run)
+        print(summary["error"], file=sys.stderr)
+        if summary["stderr"]:
+            print(summary["stderr"], file=sys.stderr)
+        return 1
+
+    try:
+        raw_data = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        summary = {
+            "lastUpdated": scanner_time_iso,
+            "status": "error",
+            "error": f"Failed to parse OpenClaw JSON: {exc}",
+            "stderr": (result.stderr or "").strip(),
+            "stdoutSnippet": (result.stdout or "")[:500],
+            "counts": {"models": 0, "historyKeys": 0},
+        }
+        write_summary(summary_path, summary, args.dry_run)
+        print(summary["error"], file=sys.stderr)
+        return 1
+
+    models = build_models(raw_data, scanner_time_iso)
+    new_data_payload = {"lastUpdated": scanner_time_iso, "models": models}
+
+    existing_data = load_json_safe(data_path, {"models": []})
+    data_changed = data_semantic_signature(existing_data) != data_semantic_signature(new_data_payload)
+
+    history_payload = load_json_safe(history_path, {})
+    if not isinstance(history_payload, dict):
+        history_payload = {}
+
+    updated_history, history_changed = update_history(
+        history_payload,
+        models,
+        scanner_time_iso,
+        max(1, args.history_interval_min),
+        max(1, args.history_max_samples),
+    )
+
+    wrote_files: List[str] = []
+
+    if data_changed and not args.dry_run:
+        atomic_write_json(data_path, new_data_payload)
+        wrote_files.append("data.json")
+
+    if history_changed and not args.dry_run:
+        atomic_write_json(history_path, updated_history)
+        wrote_files.append("history.json")
+
+    summary = {
+        "lastUpdated": scanner_time_iso,
+        "status": "ok",
+        "error": None,
+        "counts": {
+            "models": len(models),
+            "historyKeys": len(updated_history.keys()),
+            "dataChanged": data_changed,
+            "historyChanged": history_changed,
+        },
+    }
+    write_summary(summary_path, summary, args.dry_run)
+
+    print(
+        f"Scan complete. models={len(models)} dataChanged={data_changed} historyChanged={history_changed} dryRun={args.dry_run}"
+    )
+
+    if data_changed or history_changed:
+        run_git(
+            script_dir,
+            commit_message=f"Auto-sync usage data: {scanner_time_iso}",
+            files=["data.json", "history.json", "summary.json"],
+            dry_run=args.dry_run,
+            no_git=args.no_git,
+        )
+    else:
+        print("No meaningful data/history changes; git commit skipped.")
+
+    return 0
+
 
 if __name__ == "__main__":
-    fetch_usage()
+    sys.exit(main())
