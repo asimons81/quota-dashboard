@@ -46,7 +46,12 @@
       background: var(--ok);
       color: #04261f;
       cursor: pointer;
+      pointer-events: auto;
+      position: relative;
+      z-index: 2;
+      transition: transform 120ms ease;
     }
+    button:active { transform: translateY(1px); }
     button[disabled] { opacity: .6; cursor: progress; }
     .pill {
       border: 1px solid var(--border-metal);
@@ -80,6 +85,11 @@
     }
     #error-panel h2 { margin: 0 0 8px; font-size: 1rem; }
     #error-panel ul { margin: 8px 0 0 18px; color: var(--text-dim); }
+    #action-status {
+      margin-top: 8px;
+      font-size: .85rem;
+      color: var(--text-dim);
+    }
     main {
       padding: 24px;
       display: grid;
@@ -126,6 +136,7 @@
     <h2>Data Health</h2>
     <div>Last fetch error: <span id="last-error">None</span></div>
     <div>Last good data time: <span id="last-good-time">--</span></div>
+    <div>Action status: <span id="action-status">Idle</span></div>
     <ul>
       <li>Usage can jump or drop at reset boundaries.</li>
       <li>If status is STALE/ERROR, verify scanner scheduling and OpenClaw credentials.</li>
@@ -136,44 +147,92 @@
   <main id="dashboard-grid"></main>
 
   <script>
-    const REFRESH_MS = 30000;
-    const STALE_MS = 120000;
-    const cacheKey = 'quota_cache_v2';
+    document.addEventListener('DOMContentLoaded', () => {
+      const REFRESH_MS = 30000;
+      const STALE_MS = 120000;
+      const cacheKey = 'quota_cache_v2';
 
-    let dashboardData = null;
-    let historyData = {};
-    let config = { syncEndpoint: null, syncMethod: 'POST', syncPayload: {}, refreshDelayMs: 3000 };
-    let lastFetchSuccessAt = 0;
-    let lastFetchError = null;
+      let dashboardData = null;
+      let historyData = {};
+      let config = { syncEndpoint: null, syncMethod: 'POST', syncPayload: {}, refreshDelayMs: 3000 };
+      let lastFetchSuccessAt = 0;
+      let lastFetchError = null;
+      let activeFetchController = null;
+      let activeFetchPromise = null;
 
-    const grid = document.getElementById('dashboard-grid');
-    const syncButton = document.getElementById('sync-button');
-    const statusText = document.getElementById('status-text');
-    const lastSyncText = document.getElementById('last-sync');
-    const lastErrorText = document.getElementById('last-error');
-    const lastGoodTimeText = document.getElementById('last-good-time');
-    const banner = document.getElementById('banner');
+      const grid = document.getElementById('dashboard-grid');
+      const syncButton = document.getElementById('sync-button');
+      const statusText = document.getElementById('status-text');
+      const lastSyncText = document.getElementById('last-sync');
+      const lastErrorText = document.getElementById('last-error');
+      const lastGoodTimeText = document.getElementById('last-good-time');
+      const actionStatusText = document.getElementById('action-status');
+      const banner = document.getElementById('banner');
 
-    const showBanner = (message) => {
-      banner.textContent = message;
-      banner.style.display = 'block';
-      clearTimeout(showBanner._timer);
-      showBanner._timer = setTimeout(() => banner.style.display = 'none', 7000);
-    };
+      const required = { grid, statusText, lastSyncText, lastErrorText, lastGoodTimeText, banner, actionStatusText };
+      const missingCore = Object.entries(required).filter(([, node]) => !node).map(([name]) => name);
+      if (missingCore.length) {
+        console.error('Critical dashboard DOM nodes missing:', missingCore.join(', '));
+        return;
+      }
 
-    const localDate = (iso) => {
+      if (!syncButton) {
+        const message = 'Refresh control missing from DOM';
+        console.error(message);
+        banner.textContent = message;
+        banner.style.display = 'block';
+        actionStatusText.textContent = message;
+        actionStatusText.className = 'status-error';
+        return;
+      }
+
+      const getCachedData = () => {
+        try {
+          return localStorage.getItem(cacheKey);
+        } catch (error) {
+          console.warn('Local cache unavailable:', error);
+          return null;
+        }
+      };
+
+      const setCachedData = (value) => {
+        try {
+          localStorage.setItem(cacheKey, value);
+        } catch (error) {
+          console.warn('Unable to write cache:', error);
+        }
+      };
+
+      const showBanner = (message) => {
+        banner.textContent = message;
+        banner.style.display = 'block';
+        clearTimeout(showBanner._timer);
+        showBanner._timer = setTimeout(() => banner.style.display = 'none', 7000);
+      };
+
+      const setActionStatus = (message, level = 'status-ok') => {
+        actionStatusText.textContent = message;
+        actionStatusText.className = level;
+        if (level === 'status-error') {
+          console.error('[dashboard]', message);
+        } else {
+          console.info('[dashboard]', message);
+        }
+      };
+
+      const localDate = (iso) => {
       const date = new Date(iso);
       if (isNaN(date.getTime())) return '--';
       return date.toLocaleString();
     };
 
-    function classifyColor(percent) {
+      function classifyColor(percent) {
       if (percent < 50) return 'var(--ok)';
       if (percent < 80) return 'var(--warn)';
       return 'var(--bad)';
     }
 
-    function formatCountdown(resetAt) {
+      function formatCountdown(resetAt) {
       if (!resetAt) return 'No reset timestamp';
       const diff = Number(resetAt) - Date.now();
       if (diff <= 0) return 'Reset window reached';
@@ -183,7 +242,7 @@
       return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
-    function renderSparkline(series) {
+      function renderSparkline(series) {
       const points = (series || []).slice(-20);
       if (!points.length) {
         return '<svg class="sparkline" viewBox="0 0 60 18" aria-label="No trend"><line x1="0" y1="17" x2="60" y2="17" stroke="#444"/></svg>';
@@ -196,12 +255,12 @@
       return `<svg class="sparkline" viewBox="0 0 60 18" aria-label="Trend"><polyline fill="none" stroke="var(--ok)" stroke-width="1.6" points="${coords}"/></svg>`;
     }
 
-    function updateStatus() {
+      function updateStatus() {
       const now = Date.now();
       let status = 'OK';
       let cls = 'status-ok';
 
-      if (!dashboardData && !localStorage.getItem(cacheKey)) {
+      if (!dashboardData && !getCachedData()) {
         status = 'ERROR';
         cls = 'status-error';
       } else {
@@ -226,7 +285,7 @@
       lastErrorText.textContent = lastFetchError || 'None';
     }
 
-    function renderModels() {
+      function renderModels() {
       const models = dashboardData?.models || [];
       if (!models.length) {
         grid.innerHTML = '<div class="empty">No usage windows found (check credentials).</div>';
@@ -259,18 +318,18 @@
       }).join('');
     }
 
-    async function fetchConfig() {
-      try {
-        const res = await fetch('config.json', { cache: 'no-store' });
-        if (!res.ok) return;
-        config = { ...config, ...(await res.json()) };
-      } catch (_) {
-        // optional config fallback
+      async function fetchConfig() {
+        try {
+          const res = await fetch('config.json', { cache: 'no-store' });
+          if (!res.ok) return;
+          config = { ...config, ...(await res.json()) };
+        } catch (_) {
+          // optional config fallback
+        }
+        syncButton.textContent = config.syncEndpoint ? 'SYNC NOW' : 'REFRESH';
       }
-      syncButton.textContent = config.syncEndpoint ? 'SYNC NOW' : 'REFRESH';
-    }
 
-    async function fetchHistory() {
+      async function fetchHistory() {
       try {
         const v = Math.floor(Date.now() / 30000);
         const res = await fetch(`history.json?v=${v}`, { cache: 'no-store' });
@@ -281,85 +340,126 @@
       }
     }
 
-    async function fetchData() {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      try {
-        const v = Math.floor(Date.now() / 30000);
-        const res = await fetch(`data.json?v=${v}`, { cache: 'no-store', signal: controller.signal });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
-        dashboardData = JSON.parse(text);
-        localStorage.setItem(cacheKey, text);
-        lastFetchSuccessAt = Date.now();
-        lastFetchError = null;
-      } catch (error) {
-        lastFetchError = error.message || String(error);
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          dashboardData = JSON.parse(cached);
-          showBanner(`Using cached data. Latest fetch failed: ${lastFetchError}`);
-        } else {
-          dashboardData = null;
-          showBanner(`Unable to load data.json: ${lastFetchError}`);
+      async function fetchData({ force = false } = {}) {
+        if (activeFetchPromise) {
+          if (!force) {
+            setActionStatus('Fetch already in progress; skipped duplicate refresh.', 'status-stale');
+            return activeFetchPromise;
+          }
+          console.warn('[dashboard] Aborting previous fetch for forced refresh.');
+          activeFetchController?.abort();
         }
-      } finally {
-        clearTimeout(timeoutId);
+
+        const controller = new AbortController();
+        activeFetchController = controller;
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        let requestPromise;
+
+        requestPromise = (async () => {
+          try {
+            const v = Math.floor(Date.now() / 30000);
+            const res = await fetch(`data.json?v=${v}`, { cache: 'no-store', signal: controller.signal });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const text = await res.text();
+            dashboardData = JSON.parse(text);
+            setCachedData(text);
+            lastFetchSuccessAt = Date.now();
+            lastFetchError = null;
+            setActionStatus('Data refreshed successfully.', 'status-ok');
+          } catch (error) {
+            lastFetchError = error.name === 'AbortError' ? 'Request timed out' : (error.message || String(error));
+            const cached = getCachedData();
+            if (cached) {
+              dashboardData = JSON.parse(cached);
+              showBanner(`Fetch failed (using cache): ${lastFetchError}`);
+              setActionStatus('Fetch failed (using cache).', 'status-stale');
+            } else {
+              dashboardData = null;
+              showBanner(`Fetch failed (no cache available): ${lastFetchError}`);
+              setActionStatus('Fetch failed (no cache available).', 'status-error');
+            }
+          } finally {
+            clearTimeout(timeoutId);
+            if (activeFetchController === controller) activeFetchController = null;
+            if (activeFetchPromise === requestPromise) activeFetchPromise = null;
+            renderModels();
+            updateStatus();
+          }
+        })();
+
+        activeFetchPromise = requestPromise;
+        return requestPromise;
       }
-      renderModels();
-      updateStatus();
-    }
 
-    async function triggerSync() {
-      syncButton.disabled = true;
-      try {
-        if (!config.syncEndpoint) {
-          await fetchData();
-          return;
-        }
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+      async function runRemoteSync() {
         const response = await fetch(config.syncEndpoint, {
           method: config.syncMethod || 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(config.syncPayload || {})
         });
-
         if (!response.ok) {
           throw new Error(`Sync endpoint returned HTTP ${response.status}`);
         }
-
-        setTimeout(fetchData, Number(config.refreshDelayMs) || 3000);
-      } catch (error) {
-        const msg = error instanceof TypeError
-          ? 'Sync failed: network/CORS blocked request. Check endpoint origin and CORS headers.'
-          : `Sync failed: ${error.message}`;
-        lastFetchError = msg;
-        showBanner(msg);
-        updateStatus();
-      } finally {
-        syncButton.disabled = false;
       }
-    }
 
-    function tickCountdowns() {
+      async function handleRefreshClick(event) {
+        event.preventDefault();
+
+        const idleLabel = config.syncEndpoint ? 'SYNC NOW' : 'REFRESH';
+        const busyLabel = config.syncEndpoint ? 'SYNCING…' : 'REFRESHING…';
+        syncButton.disabled = true;
+        syncButton.textContent = busyLabel;
+
+        try {
+          if (config.syncEndpoint) {
+            setActionStatus('Running remote sync…', 'status-stale');
+            try {
+              await runRemoteSync();
+              setActionStatus('Remote sync completed. Refreshing dashboard…', 'status-stale');
+              await wait(Number(config.refreshDelayMs) || 3000);
+            } catch (error) {
+              const msg = error instanceof TypeError
+                ? 'Sync endpoint blocked by CORS. Refresh still works. Configure a same-origin endpoint or proxy.'
+                : `Sync failed: ${error.message || String(error)}`;
+              lastFetchError = msg;
+              showBanner(msg);
+              setActionStatus(msg, 'status-error');
+            }
+          } else {
+            setActionStatus('Refreshing local data…', 'status-stale');
+          }
+
+          await fetchHistory();
+          await fetchData({ force: true });
+        } finally {
+          syncButton.disabled = false;
+          syncButton.textContent = idleLabel;
+        }
+      }
+
+      function tickCountdowns() {
       document.querySelectorAll('.countdown').forEach((node) => {
         node.textContent = formatCountdown(node.dataset.reset);
       });
       updateStatus();
     }
 
-    syncButton.addEventListener('click', triggerSync);
+      syncButton.addEventListener('click', handleRefreshClick);
 
-    (async function init() {
-      await fetchConfig();
-      await fetchHistory();
-      await fetchData();
-      setInterval(async () => {
+      (async function init() {
+        await fetchConfig();
+        setActionStatus('Dashboard initialized.', 'status-ok');
         await fetchHistory();
-        await fetchData();
-      }, REFRESH_MS);
-      setInterval(tickCountdowns, 1000);
-    })();
+        await fetchData({ force: true });
+        setInterval(async () => {
+          await fetchHistory();
+          await fetchData();
+        }, REFRESH_MS);
+        setInterval(tickCountdowns, 1000);
+      })();
+    });
   </script>
 </body>
 </html>
