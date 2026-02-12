@@ -183,6 +183,10 @@
     {
       "timestamp": "2026-02-12T22:15:16.713250Z",
       "percentage": 0.0
+    },
+    {
+      "timestamp": "2026-02-12T22:30:14.245675Z",
+      "percentage": 0.0
     }
   ],
   "antigravity:gemini-2.5-flash": [
@@ -368,6 +372,10 @@
     },
     {
       "timestamp": "2026-02-12T22:15:16.713250Z",
+      "percentage": 0.0
+    },
+    {
+      "timestamp": "2026-02-12T22:30:14.245675Z",
       "percentage": 0.0
     }
   ],
