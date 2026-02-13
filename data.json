@@ -1,14 +1,14 @@
 {
-  "lastUpdated": "2026-02-13T12:45:08.272407Z",
+  "lastUpdated": "2026-02-13T13:00:33.091785Z",
   "models": [
     {
       "key": "antigravity:gemini-2.5-flash",
       "provider": "Antigravity",
       "label": "gemini-2.5-flash",
       "percentage": 0.0,
-      "resetAt": 1771004711000,
-      "resetAtIso": "2026-02-13T17:45:11Z",
-      "lastUpdated": "2026-02-13T12:45:08.272407Z"
+      "resetAt": 1771005635000,
+      "resetAtIso": "2026-02-13T18:00:35Z",
+      "lastUpdated": "2026-02-13T13:00:33.091785Z"
     },
     {
       "key": "antigravity:gemini-3-flash",
@@ -17,16 +17,16 @@
       "percentage": 0.0,
       "resetAt": 1771001129000,
       "resetAtIso": "2026-02-13T16:45:29Z",
-      "lastUpdated": "2026-02-13T12:45:08.272407Z"
+      "lastUpdated": "2026-02-13T13:00:33.091785Z"
     },
     {
       "key": "antigravity:gemini-3-pro-image",
       "provider": "Antigravity",
       "label": "gemini-3-pro-image",
       "percentage": 0.0,
-      "resetAt": 1771004711000,
-      "resetAtIso": "2026-02-13T17:45:11Z",
-      "lastUpdated": "2026-02-13T12:45:08.272407Z"
+      "resetAt": 1771005635000,
+      "resetAtIso": "2026-02-13T18:00:35Z",
+      "lastUpdated": "2026-02-13T13:00:33.091785Z"
     }
   ]
 }
