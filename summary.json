@@ -1,11 +1,11 @@
 {
-  "lastUpdated": "2026-02-13T05:28:21.906784Z",
+  "lastUpdated": "2026-02-13T06:46:08.323448Z",
   "status": "ok",
   "error": null,
   "counts": {
     "models": 3,
     "historyKeys": 3,
     "dataChanged": true,
-    "historyChanged": true
+    "historyChanged": false
   }
 }
