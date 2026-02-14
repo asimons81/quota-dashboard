@@ -148,7 +148,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const REFRESH_MS = 30000;
+      // Auto-refresh disabled - manual refresh only
       const STALE_MS = 120000;
       const cacheKey = 'quota_cache_v2';
 
@@ -453,10 +453,11 @@
         setActionStatus('Dashboard initialized.', 'status-ok');
         await fetchHistory();
         await fetchData({ force: true });
-        setInterval(async () => {
-          await fetchHistory();
-          await fetchData();
-        }, REFRESH_MS);
+        // Auto-refresh disabled - manual refresh only
+        // setInterval(async () => {
+        //   await fetchHistory();
+        //   await fetchData();
+        // }, REFRESH_MS);
         setInterval(tickCountdowns, 1000);
       })();
     });
