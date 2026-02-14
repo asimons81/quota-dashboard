@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 DEFAULT_SAMPLE_INTERVAL_MIN = 10
 DEFAULT_MAX_HISTORY = 288
-BLACKLIST = {"gemini-2.5-pro", "gemini-2.5-flash-thinking", "gemini-2.5-flash-lite"}
+DEFAULT_BLACKLIST = "gemini-2.5-pro,gemini-2.5-flash-thinking,gemini-2.5-flash-lite"
 
 
 def utc_now_iso() -> str:
@@ -89,9 +89,10 @@ def run_openclaw(timeout_s: int = 30) -> subprocess.CompletedProcess:
     )
 
 
-def build_models(raw_data: Dict[str, Any], scanner_time_iso: str) -> List[Dict[str, Any]]:
+def build_models(raw_data: Dict[str, Any], scanner_time_iso: str, blacklist: Optional[List[str]] = None) -> List[Dict[str, Any]]:
     providers = raw_data.get("usage", {}).get("providers", [])
     models: List[Dict[str, Any]] = []
+    blacklist_set = set(blacklist) if blacklist else set()
 
     for provider in providers:
         provider_name = str(provider.get("displayName") or provider.get("provider") or "unknown").strip()
@@ -99,7 +100,7 @@ def build_models(raw_data: Dict[str, Any], scanner_time_iso: str) -> List[Dict[s
 
         for window in provider.get("windows", []):
             label = str(window.get("label") or "unknown").strip()
-            if label in BLACKLIST:
+            if label in blacklist_set:
                 continue
 
             percent = normalize_percent(window.get("usedPercent"))
@@ -227,6 +228,12 @@ def parse_args() -> argparse.Namespace:
         default=int(os.getenv("HISTORY_MAX_SAMPLES", DEFAULT_MAX_HISTORY)),
         help="Maximum number of history samples retained per key.",
     )
+    parser.add_argument(
+        "--blacklist",
+        type=str,
+        default=os.getenv("QUOTA_BLACKLIST", DEFAULT_BLACKLIST),
+        help="Comma-separated list of model labels to exclude from the dashboard.",
+    )
     return parser.parse_args()
 
 
@@ -298,7 +305,8 @@ def main() -> int:
         print(summary["error"], file=sys.stderr)
         return 1
 
-    models = build_models(raw_data, scanner_time_iso)
+    blacklist = [item.strip() for item in args.blacklist.split(",") if item.strip()]
+    models = build_models(raw_data, scanner_time_iso, blacklist=blacklist)
     new_data_payload = {"lastUpdated": scanner_time_iso, "models": models}
 
     existing_data = load_json_safe(data_path, {"models": []})
